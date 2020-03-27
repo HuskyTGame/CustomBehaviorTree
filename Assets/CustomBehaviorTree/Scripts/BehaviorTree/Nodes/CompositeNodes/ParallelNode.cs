@@ -3,7 +3,7 @@
 	作者：HuskyT
 	邮箱：1005240602@qq.com
 	日期：2020/3/25 23:45:37
-	功能：平行节点（组合节点）
+	功能：并行节点（组合节点）
 *****************************************************/
 
 using System.Collections.Generic;
@@ -14,7 +14,7 @@ namespace AI.BehaviorTree
     public class ParallelNode : NodeBase
     {
         /// <summary>
-        /// 子节点需要完成多少个，平行节点才返回 Finished
+        /// 子节点需要完成多少个，并行节点才返回 Finished
         /// </summary>
         private int mNeedFinishedNumInChildren;
         /// <summary>
@@ -31,9 +31,9 @@ namespace AI.BehaviorTree
         protected int mFailedNum;
 
         /// <summary>
-        /// 平行节点（参数：子节点需要完成多少个，平行节点才返回 Finished）
+        /// 并行节点（参数：子节点需要完成多少个，并行节点才返回 Finished）
         /// </summary>
-        /// <param 子节点需要完成多少个，平行节点才返回Finished="needFinishedNumInChildren"></param>
+        /// <param 子节点需要完成多少个，并行节点才返回Finished="needFinishedNumInChildren"></param>
         public ParallelNode(int needFinishedNumInChildren)
         {
             mNeedFinishedNumInChildren = needFinishedNumInChildren;
@@ -69,6 +69,10 @@ namespace AI.BehaviorTree
                 if (status == BTNodeStatus.Finished)
                 {
                     //更新  子节点行为状态  到  子节点运行状态列表
+                    //此步骤的目的：
+                    //并行节点在 Running 状态下的时候
+                    //状态为 Running 和 Failed 的子节点每帧都会更新状态
+                    //状态为 Finished 的子节点不再更新状态
                     mChildrenStatusList[i] = BTNodeStatus.Finished;
                     mFinishedNum += 1;
                     //满足子节点需要完成的次数
@@ -80,6 +84,8 @@ namespace AI.BehaviorTree
                 //3--子节点行为失败（第一次更新该子节点时可能出现）
                 if (status == BTNodeStatus.Failed)
                 {
+                    //此处不更新  子节点运行状态列表
+                    //原因：运行状态为 Failed 的子节点在下一帧中还需要重新更新运行状态
                     mFailedNum += 1;
                     //若失败次数足够多
                     if (mFailedNum > mChildren.Count - mNeedFinishedNumInChildren)

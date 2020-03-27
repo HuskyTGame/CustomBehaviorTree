@@ -17,7 +17,7 @@ namespace HTUtility
         /// <summary>
         /// MarkDown文件名
         /// </summary>
-        private static string mMarkDownFileName = "版本记录.md";
+        private static string mMarkDownFileName = "2020-03-27-AI--BehaviorTree.md";
 
         [MenuItem("HTUtility/2.OpenMarkDown %m", false, 2)]
         private static void MenuClick()
